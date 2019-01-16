@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Web Poketalk</title>
+    <link rel="shortcut icon" href="img/favicon.png" />
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <header>
+        <div id="colorHeader"><h1>翻訳モード</h1></div>
+      </header>
+
+      <main class="scroll" id="scrollp">
+        <ul>
+          <li v-for="log in logs">
+            <img :src="log.img" /> <b class="log">{{ log.speaker }}</b>
+            <p>{{ log.text }}</p>
+            <hr />
+          </li>
+        </ul>
+      </main>
+
+      <footer>
+        <input v-model="message" type="text" id="autocomplete-input" />
+        <button id="colorVoiceTrans" v-on:click="startSpeech">
+          {{ recognitionText }}
+        </button>
+        <button id="colorSubmit" v-on:click="submit">送信</button>
+        <div>© 2019 Copyright tabo</div>
+      </footer>
+    </div>
+    <script src="js/vue.js"></script>
+  </body>
+</html>
