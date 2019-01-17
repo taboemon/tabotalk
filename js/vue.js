@@ -1,4 +1,3 @@
-// TODO スクロール問題(本当に今ひどい)
 // TODO 色を変える処理(input)
 // TODO リファクタリング
 // TODO アイコン考慮
@@ -88,7 +87,7 @@ var app = new Vue({
     },
     scrollLogs: function(time) {
       Vue.nextTick(()=>{
-        this.$refs.scrollp.scrollBy(0, this.$refs.scrollp.offsetHeight);
+        this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight
       });
     },
     pushLogs: function(speaker, text, img) {
