@@ -87,10 +87,9 @@ var app = new Vue({
       };
     },
     scrollLogs: function(time) {
-      var element = document.getElementById("scrollp");
-      setTimeout(time => {
-        element.scrollBy(0, element.offsetHeight);
-      }, time);
+      Vue.nextTick(()=>{
+        this.$refs.scrollp.scrollBy(0, this.$refs.scrollp.offsetHeight);
+      });
     },
     pushLogs: function(speaker, text, img) {
       this.logs.push({ speaker: speaker, text: text, img: img });
