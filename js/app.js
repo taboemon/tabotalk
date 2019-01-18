@@ -15,18 +15,14 @@ var buildQuery = function(data) {
   return q.join("&");
 };
 
-var say = function(text, lang) {
-  var utter = new SpeechSynthesisUtterance(text);
-  utter.lang = lang;
-  speechSynthesis.speak(utter);
-};
-
 var app = new Vue({
   el: "#app",
   data: {
     message: "", // 入力データの一時変数
     logs: [], // 入力データを詰めていくlist
     recognitionText: "音声入力", // ボタンのラベル
+    inputLang: 'ja',
+    inputLocal: "ja-JP",
     outputLang: 'en'
   },
   methods: {
@@ -35,19 +31,19 @@ var app = new Vue({
       if (this.message === "") {
         return;
       }
-      this.pushLogs("You", this.message, "img/user.png");
+      this.pushLogs("You", this.message, this.inputLang);
       // 翻訳モード時の処理
       var qs = buildQuery({
         text: this.message,
-        source: "ja",
+        source: this.inputLang,
         target: this.outputLang
       });
       console.log(`${API_URL}?${qs}`)
       axios
         .get(`${API_URL}?${qs}`)
         .then(response => {
-          this.pushLogs("Chat bot", response.data, "img/route66.png");
-          say(response.data, this.outputLang);
+          this.pushLogs("Chat bot", response.data, this.outputLang);
+          this.say(response.data, this.outputLang);
         })
         .catch(error => {
           console.log(error);
@@ -57,7 +53,7 @@ var app = new Vue({
     // 音声入力の処理
     startSpeech: function(event) {
       const speech = new webkitSpeechRecognition();
-      speech.lang = "ja-JP";
+      speech.lang = this.inputLocal;
       speech.start();
       speech.onresult = e => {
         speech.stop();
@@ -74,7 +70,7 @@ var app = new Vue({
             .get(`${API_URL}?${qs}`)
             .then(response => {
               this.pushLogs("Chat bot", response.data, "img/route66.png");
-              say(response.data, this.outputLang);
+              this.say(response.data, this.outputLang);
             })
             .catch(error => {
               console.log(error);
@@ -102,11 +98,16 @@ var app = new Vue({
         this.outputLang = 'en'
       }
     },
-    pushLogs: function(speaker, text, img) {
-      this.logs.push({ speaker: speaker, text: text, img: img });
+    pushLogs: function(speaker, text, lang) {
+      this.logs.push({ speaker, text, lang });
       Vue.nextTick(() => {
         this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
       });
-    }
+    },
+    say: function(text, lang) {
+      var utter = new SpeechSynthesisUtterance(text);
+      utter.lang = lang;
+      speechSynthesis.speak(utter);
+    },
   }
 });

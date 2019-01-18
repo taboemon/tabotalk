@@ -20,9 +20,19 @@
       <main class="scroll" ref="scrollp">
         <ul>
           <li v-for="log in logs">
-            <img :src="log.img" /> <b class="log">{{ log.speaker }}</b>
-            <p>{{ log.text }}</p>
-            <hr />
+            <div v-if="log.speaker=='You'">
+              <img src="img/user.png">
+              <b class="log">{{ log.speaker }}</b>
+              <p>{{ log.text }}</p>
+              <hr />
+            </div>
+            <div v-if="log.speaker=='Chat bot'">
+                <img src="img/route66.png">
+                <b class="log">{{ log.speaker }}</b>
+                <p>{{ log.text }}</p>
+                <button @click="say(log.text, log.lang)">しゃべる</button>
+                <hr />
+              </div>
           </li>
         </ul>
       </main>
