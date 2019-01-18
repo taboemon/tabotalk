@@ -5,7 +5,7 @@
 // TODO logをクリックしたら現在選択中の音声で再生
 
 var API_URL = "https://script.google.com/macros/s/AKfycbweJFfBqKUs5gGNnkV2xwTZtZPptI6ebEhcCU2_JvOmHwM2TCk/exec";
-var buildQuery = function(data) {
+var buildQuery = function (data) {
   var q = [];
   for (var key in data) {
     if (data.hasOwnProperty(key)) {
@@ -21,15 +21,21 @@ var app = new Vue({
     message: "", // 入力データの一時変数
     logs: [], // 入力データを詰めていくlist
     recognitionText: "音声入力", // ボタンのラベル
-    inputLang: 'ja',
-    inputLocal: "ja-JP",
-    outputLang: 'en'
+    inputLang: '',
+    outputLang: ''
   },
   methods: {
     // 送信ボタンを押された場合の処理
-    submit: function(event) {
+    submit: function (event) {
+      console.log(this.inputLang)
       if (this.message === "") {
         return;
+      }
+      if (this.inputLang === this.outputLang) {
+        return alert('Not translated');
+      }
+      if (this.inputLang === "" || this.outputLang === "") {
+        return alert('Please select a language');
       }
       this.pushLogs("You", this.message, this.inputLang);
       // 翻訳モード時の処理
@@ -51,9 +57,15 @@ var app = new Vue({
       this.message = "";
     },
     // 音声入力の処理
-    startSpeech: function(event) {
+    startSpeech: function (event) {
+      if (this.inputLang === this.outputLang) {
+        return alert('Not translated');
+      }
+      if (this.inputLang === "" || this.outputLang === "") {
+        return alert('Please select a language');
+      }
       const speech = new webkitSpeechRecognition();
-      speech.lang = this.inputLocal;
+      speech.lang = this.inputLang;
       speech.start();
       speech.onresult = e => {
         speech.stop();
@@ -63,7 +75,7 @@ var app = new Vue({
           this.pushLogs("You", voiceText, "img/user.png");
           var qs = buildQuery({
             text: voiceText,
-            source: 'ja',
+            source: this.inputLang,
             target: this.outputLang
           });
           axios
@@ -91,20 +103,13 @@ var app = new Vue({
         this.recognitionText = "Waiting";
       };
     },
-    changeLang: function(event) {
-      if (this.outputLang === 'en') {
-        this.outputLang = 'zh-cn'
-      } else {
-        this.outputLang = 'en'
-      }
-    },
-    pushLogs: function(speaker, text, lang) {
+    pushLogs: function (speaker, text, lang) {
       this.logs.push({ speaker, text, lang });
       Vue.nextTick(() => {
         this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
       });
     },
-    say: function(text, lang) {
+    say: function (text, lang) {
       var utter = new SpeechSynthesisUtterance(text);
       utter.lang = lang;
       speechSynthesis.speak(utter);
