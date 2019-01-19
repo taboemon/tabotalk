@@ -2,12 +2,12 @@
 // TODO リファクタリング
 // TODO アイコン考慮
 // TODO ロゴ（カスタマイズ参考サイト）
-// TODO logをクリックしたら現在選択中の音声で再生
+// TODO 音声再生中入力を不可にする
 
-var API_URL = "https://script.google.com/macros/s/AKfycbweJFfBqKUs5gGNnkV2xwTZtZPptI6ebEhcCU2_JvOmHwM2TCk/exec";
-var buildQuery = function (data) {
-  var q = [];
-  for (var key in data) {
+const API_URL = "https://script.google.com/macros/s/AKfycbweJFfBqKUs5gGNnkV2xwTZtZPptI6ebEhcCU2_JvOmHwM2TCk/exec";
+let buildQuery = function (data) {
+  let q = [];
+  for (let key in data) {
     if (data.hasOwnProperty(key)) {
       q.push(`${key}=${encodeURIComponent(data[key])}`);
     }
@@ -15,7 +15,7 @@ var buildQuery = function (data) {
   return q.join("&");
 };
 
-var app = new Vue({
+let app = new Vue({
   el: "#app",
   data: {
     message: "", // 入力データの一時変数
@@ -27,7 +27,6 @@ var app = new Vue({
   methods: {
     // 送信ボタンを押された場合の処理
     submit: function (event) {
-      console.log(this.logs)
       if (this.message === "") {
         return;
       }
@@ -39,7 +38,7 @@ var app = new Vue({
       }
       this.pushLogs("You", this.message, this.inputLang);
       // 翻訳モード時の処理
-      var qs = buildQuery({
+      let qs = buildQuery({
         text: this.message,
         source: this.inputLang,
         target: this.outputLang
@@ -71,9 +70,9 @@ var app = new Vue({
         speech.stop();
         if (e.results[0].isFinal) {
           // 翻訳モードの時の処理
-          var voiceText = e.results[0][0].transcript;
+          let voiceText = e.results[0][0].transcript;
           this.pushLogs("You", voiceText, this.inputLang);
-          var qs = buildQuery({
+          let qs = buildQuery({
             text: voiceText,
             source: this.inputLang,
             target: this.outputLang
@@ -110,7 +109,7 @@ var app = new Vue({
       });
     },
     say: function (text, lang) {
-      var utter = new SpeechSynthesisUtterance(text);
+      let utter = new SpeechSynthesisUtterance(text);
       utter.lang = lang;
       speechSynthesis.speak(utter);
     },
