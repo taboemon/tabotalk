@@ -27,7 +27,7 @@ var app = new Vue({
   methods: {
     // 送信ボタンを押された場合の処理
     submit: function (event) {
-      console.log(this.inputLang)
+      console.log(this.logs)
       if (this.message === "") {
         return;
       }
@@ -72,7 +72,7 @@ var app = new Vue({
         if (e.results[0].isFinal) {
           // 翻訳モードの時の処理
           var voiceText = e.results[0][0].transcript;
-          this.pushLogs("You", voiceText, "img/user.png");
+          this.pushLogs("You", voiceText, this.inputLang);
           var qs = buildQuery({
             text: voiceText,
             source: this.inputLang,
@@ -81,7 +81,7 @@ var app = new Vue({
           axios
             .get(`${API_URL}?${qs}`)
             .then(response => {
-              this.pushLogs("Chat bot", response.data, "img/route66.png");
+              this.pushLogs("Chat bot", response.data, this.outputLang);
               this.say(response.data, this.outputLang);
             })
             .catch(error => {
