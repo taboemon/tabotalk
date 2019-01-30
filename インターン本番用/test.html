@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <!-- 1 タイトルをつけよう-->
+    <title>好きなタイトルを書いてね</title>
+    <!-- 8 ファビコンをつけてみよう-->
+    <link rel="shortcut icon" href="img/favicon.png" />
+    <style>
+      /* 4 レイアウトを整えてみよう*/
+      #app {
+        display: flex;
+        min-height: 90vh;
+        flex-direction: column;
+      }
+      body {
+        text-align: center;
+      }
+      main {
+        flex: auto;
+      }
+      ul {
+        list-style: none;
+        text-align: left;
+      }
+      .scroll {
+        width: 100%;
+        height: 56px;
+        overflow: scroll;
+      }
+    </style>
+    <!-- 9 画面を動かすためのライブラリを読み込もう -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <!-- 2 アプリの名前をつけよう-->
+      <header><h1>作成するアプリの名前をつけよう</h1></header>
+
+      <!-- 6 チャット部分を仮で作ってみよう-->
+      <main class="scroll" ref="scrollp">
+        <ul>
+          <li v-for="log in logs">
+            <!-- 7 ユーザ画像を描写してみよう -->
+            <div v-if="log.speaker=='You'">
+              <img src="img/user.png" /> <b class="log">{{ log.speaker }}</b>
+              <p>{{ log.text }}</p>
+              <hr />
+            </div>
+            <div v-if="log.speaker=='Chat bot'">
+              <img src="img/route66.png" /> <b class="log">{{ log.speaker }}</b>
+              <p>{{ log.text }}</p>
+              <button @click="say(log.text, log.lang)">しゃべる</button>
+              <hr />
+            </div>
+          </li>
+        </ul>
+      </main>
+
+      <footer>
+        <!-- 3 ボタンを配置してみよう-->
+        <input v-model="message" type="text" />
+        <button v-on:click="submit">送信</button>
+        <button v-on:click="startSpeech">音声入力</button> <br />
+        <!-- 5 言語選択できるボタンを配置してみよう-->
+        <select v-model="inputLang">
+          <option disabled value="">入力言語選択</option>
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+          <option value="zh-cn">中国語</option>
+        </select>
+        <select v-model="outputLang">
+          <option disabled value="">翻訳言語選択</option>
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+          <option value="zh-cn">中国語</option>
+        </select>
+      </footer>
+    </div>
+    <script>
+      // 16 翻訳部分を作ってみよう！（ここはふーーんでいってもらう）
+      const API_URL =
+        "https://script.google.com/macros/s/AKfycbweJFfBqKUs5gGNnkV2xwTZtZPptI6ebEhcCU2_JvOmHwM2TCk/exec";
+      let buildQuery = function(data) {
+        let q = [];
+        for (let key in data) {
+          if (data.hasOwnProperty(key)) {
+            q.push(`${key}=${encodeURIComponent(data[key])}`);
+          }
+        }
+        return q.join("&");
+      };
+
+      // 10 さあ画面を動かしてみよう
+      let app = new Vue({
+        el: "#app",
+        data: {
+          message: "", // 入力データの一時変数
+          logs: [], // 入力データを詰めていくlist
+          inputLang: "ja",
+          outputLang: "en"
+        },
+        methods: {
+          // 送信ボタンを押された場合の処理
+          submit: function(event) {
+            // 14 メッセージが何もない時は送信しないようにしょう！
+            if (this.message === "") {
+              return alert("メッセージが何もないよ！");
+            }
+            console.log("送信！");
+            // 12 チャット部分の処理を作っていこう！
+            this.pushLogs("You", this.message, this.inputLang);
+
+            // 17 翻訳部分を作ってみよう！（ここはふーーんでいってもらう）
+            let qs = buildQuery({
+              text: this.message,
+              source: this.inputLang,
+              target: this.outputLang
+            });
+            axios
+              .get(`${API_URL}?${qs}`)
+              .then(response => {
+                this.pushLogs("Chat bot", response.data, this.outputLang);
+                // 19 ブラウザを喋らせよう！
+                this.say(response.data, this.outputLang);
+              })
+              .catch(error => {
+                console.log(error);
+              });
+
+            // 15 メッセージを送信したら入力エリアを空にしよう
+            this.message = "";
+          },
+          // 音声入力の処理
+          startSpeech: function(event) {
+            console.log("音声入力！");
+            // 13 チャット部分の処理を作っていこう！
+            // this.pushLogs("Chat bot", "test", this.outputLang);
+
+            // 20 音声入力してみよう！
+            const speech = new webkitSpeechRecognition();
+            speech.lang = this.inputLang;
+            speech.start();
+            speech.onresult = e => {
+              speech.stop();
+              if (e.results[0].isFinal) {
+                // 21 音声入力してみよう！
+              　// しゃべり終わったら認識された声を確認しよう！
+                let voiceText = e.results[0][0].transcript;
+                console.log(voiceText)
+                this.pushLogs("You", voiceText, this.inputLang);
+
+                // 22 音声入力してみよう！あとはチャット部分と同じ！
+                let qs = buildQuery({
+                  text: voiceText,
+                  source: this.inputLang,
+                  target: this.outputLang
+                });
+                axios
+                  .get(`${API_URL}?${qs}`)
+                  .then(response => {
+                    this.pushLogs("Chat bot", response.data, this.outputLang);
+                    this.say(response.data, this.outputLang);
+                  })
+                  .catch(error => {
+                    console.log(error);
+                  });
+              }
+              false;
+            };
+          },
+          pushLogs: function(speaker, text, lang) {
+            // 11 チャット部分の処理を作っていこう！（ここはふーーんでいってもらう）
+            this.logs.push({ speaker, text, lang });
+            Vue.nextTick(() => {
+              this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
+            });
+          },
+          say: function(text, lang) {
+            // 18 ブラウザを喋らせよう！
+            let utter = new SpeechSynthesisUtterance(text);
+            utter.lang = lang;
+            speechSynthesis.speak(utter);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
