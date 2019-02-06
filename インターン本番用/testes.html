@@ -19,6 +19,7 @@
       ul {
         list-style: none;
         text-align: left;
+        padding-inline-start: 0px;
       }
       .scroll {
         width: 100%;
@@ -89,7 +90,6 @@
           outputLang: "en"
         },
         methods: {
-          // 送信ボタンを押された場合の処理
           submit: function(event) {
             if (this.message === "") {
               return alert("メッセージが何もないよ！");
@@ -113,11 +113,8 @@
               });
             this.message = "";
           },
-          // 音声入力の処理
           startSpeech: function(event) {
             console.log("音声入力！");
-            // this.pushLogs("Chat bot", "test", this.outputLang);
-
             const speech = new webkitSpeechRecognition();
             speech.lang = this.inputLang;
             speech.start();
@@ -127,8 +124,6 @@
                 let voiceText = e.results[0][0].transcript;
                 console.log(voiceText);
                 this.pushLogs("You", voiceText, this.inputLang);
-
-                // 22 音声入力してみよう！あとはチャット部分と同じ！
                 let qs = buildQuery({
                   text: voiceText,
                   source: this.inputLang,
