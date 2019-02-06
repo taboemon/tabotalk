@@ -1101,7 +1101,7 @@
     <title>好きなタイトルを書いてね</title>
     <link rel="shortcut icon" href="img/favicon.png" />
     <style>
-      #app {
+      #app {ポケトーク資料
         display: flex;
         min-height: 90vh;
         flex-direction: column;
