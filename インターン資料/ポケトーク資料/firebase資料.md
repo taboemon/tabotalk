@@ -1,5 +1,7 @@
 # firebase
 
+project > public > index.html の構成にしておく
+
 firebaseのサイトに
 プロジェクト作成
 開発　→ Hosting
