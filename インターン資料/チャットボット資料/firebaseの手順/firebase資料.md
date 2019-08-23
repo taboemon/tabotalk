@@ -1,6 +1,6 @@
 # firebase
 
-project > public > index.html の構成にしておく
+googleアカウントが必要
 
 firebaseのサイトに
 プロジェクト作成
@@ -15,3 +15,5 @@ firebase deploy
 
 非公開にするには：firebase hosting:disable
 ```
+
+詳細は画像参照
