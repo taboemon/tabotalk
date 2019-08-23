@@ -72,7 +72,7 @@
               <p>{{ log.text }}</p>
               <hr />
             </div>
-            <div v-if="log.speaker=='Chat bot'">
+            <div v-if="log.speaker=='Sig Bot'">
               <img src="img/route66.png" /> <b class="log">{{ log.speaker }}</b>
               <p>{{ log.text }}</p>
               <div class="choiceBox">
@@ -108,7 +108,7 @@
           submitPushed: false,
           logs: [
             {
-              speaker: "Sig bot",
+              speaker: "Sig Bot",
               text: "シナリオ型チャットボットのサンプルです。",
               choiceList: []
             }
@@ -194,7 +194,7 @@
               default:
                 choiceList = [this.getChoiceObject(restartText)];
             }
-            this.pushLogs("Chat bot", text, choiceList);
+            this.pushLogs(botName, text, choiceList);
           },
           getChoiceObject: function(t) {
             return {
@@ -204,13 +204,15 @@
           }
         }
       });
+      const botName = "Sig Bot";
       const startChatBot = "startChatBot";
       const chatbotQuestion = "チャットボットについて知りたい";
       const chatbotVariation = "チャットボットの種類について知りたい";
       const chatbotMerit = "チャットボットのメリット";
       const ruleType = "ルールベース型について知りたい";
       const aiType = "人工知能型について知りたい";
-      const truth = "全く同じようなチャットボットを別のサイトで見たことがあるんですが";
+      const truth =
+        "全く同じようなチャットボットを別のサイトで見たことがあるんですが";
       const restartText = "はじめに戻る";
     </script>
   </body>
