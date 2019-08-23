@@ -79,7 +79,7 @@
                 <div v-for="choice in log.choiceList">
                   <button
                     class="choiceButton"
-                    @click="next(choice, index)"
+                    @click="submitChoice(choice, index)"
                     v-bind:disabled="choice.isPushed"
                   >
                     {{ choice.text }}
@@ -102,6 +102,16 @@
       </footer>
     </div>
     <script>
+      const botName = "Sig Bot";
+      const startChatBot = "startChatBot";
+      const chatbotQuestion = "チャットボットについて知りたい";
+      const chatbotVariation = "チャットボットの種類について知りたい";
+      const chatbotMerit = "チャットボットのメリット";
+      const ruleType = "ルールベース型について知りたい";
+      const aiType = "人工知能型について知りたい";
+      const truth =
+        "全く同じようなチャットボットを別のサイトで見たことがあるんですが";
+      const restartText = "はじめに戻る";
       let app = new Vue({
         el: "#app",
         data: {
@@ -125,7 +135,7 @@
               this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
             });
           },
-          next: function(choice, index) {
+          submitChoice: function(choice, index) {
             var choiceText = choice.text;
             this.pushLogs("You", choiceText, []);
             for (var choice of this.logs[index].choiceList) {
@@ -204,16 +214,6 @@
           }
         }
       });
-      const botName = "Sig Bot";
-      const startChatBot = "startChatBot";
-      const chatbotQuestion = "チャットボットについて知りたい";
-      const chatbotVariation = "チャットボットの種類について知りたい";
-      const chatbotMerit = "チャットボットのメリット";
-      const ruleType = "ルールベース型について知りたい";
-      const aiType = "人工知能型について知りたい";
-      const truth =
-        "全く同じようなチャットボットを別のサイトで見たことがあるんですが";
-      const restartText = "はじめに戻る";
     </script>
   </body>
 </html>
