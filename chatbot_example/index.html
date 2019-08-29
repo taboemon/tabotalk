@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>チャットボットサンプル</title>
+    <link rel="shortcut icon" href="img/favicon.png" />
+    <style>
+      #app {
+        display: flex;
+        min-height: 90vh;
+        flex-direction: column;
+      }
+
+      body {
+        text-align: center;
+      }
+
+      main {
+        flex: auto;
+      }
+
+      ul {
+        list-style: none;
+        text-align: left;
+        padding-inline-start: 0px;
+      }
+
+      .scroll {
+        width: 100%;
+        height: 56px;
+        overflow: scroll;
+      }
+
+      .choiceBox > div > button {
+        margin: 5px 0;
+        width: 700px;
+      }
+
+      .choiceButton {
+        display: inline-block;
+        text-align: left;
+        box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.5),
+          0 2px 2px rgba(0, 0, 0, 0.19);
+        color: #333;
+        font-size: 16px;
+        text-decoration: none;
+        font-weight: bold;
+        text-shadow: 1px 1px 1px rgba(255, 255, 255, 1);
+        padding: 12px 24px;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+
+      .choiceButton:hover {
+        opacity: 0.8;
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </head>
+
+  <body>
+    <div id="app">
+      <header>
+        <h1>チャットボットについてお問い合わせ</h1>
+      </header>
+      <main class="scroll" ref="scrollp">
+        <ul>
+          <li v-for="(log, index) in logs">
+            <div v-if="log.speaker=='You'">
+              <img src="img/user.png" /> <b class="log">{{ log.speaker }}</b>
+              <p>{{ log.text }}</p>
+              <hr />
+            </div>
+            <div v-if="log.speaker=='Sig Bot'">
+              <img src="img/route66.png" /> <b class="log">{{ log.speaker }}</b>
+              <p>{{ log.text }}</p>
+              <div class="choiceBox">
+                <div v-for="choice in log.choiceList">
+                  <button
+                    class="choiceButton"
+                    @click="submitChoice(choice, index)"
+                    v-bind:disabled="choice.isPushed"
+                  >
+                    {{ choice.text }}
+                  </button>
+                </div>
+                <hr />
+              </div>
+            </div>
+          </li>
+        </ul>
+      </main>
+      <footer>
+        <button
+          class="choiceButton"
+          v-on:click="submit"
+          v-bind:disabled="submitPushed"
+        >
+          問い合わせを行う
+        </button>
+      </footer>
+    </div>
+    <script>
+      const botName = "Sig Bot";
+      const startChatBot = "startChatBot";
+      const chatbotQuestion = "チャットボットについて知りたい";
+      const chatbotVariation = "チャットボットの種類について知りたい";
+      const chatbotMerit = "チャットボットのメリット";
+      const ruleType = "ルールベース型について知りたい";
+      const aiType = "人工知能型について知りたい";
+      const truth =
+        "全く同じようなチャットボットを別のサイトで見たことがあるんですが";
+      const restartText = "はじめに戻る";
+      let app = new Vue({
+        el: "#app",
+        data: {
+          submitPushed: false,
+          logs: [
+            {
+              speaker: "Sig Bot",
+              text: "シナリオ型チャットボットのサンプルです。",
+              choiceList: []
+            }
+          ]
+        },
+        methods: {
+          submit: function(event) {
+            this.submitPushed = true;
+            this.pushNextChoiceLog(startChatBot);
+          },
+          pushLogs: function(speaker, text, choiceList) {
+            this.logs.push({ speaker, text, choiceList });
+            Vue.nextTick(() => {
+              this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
+            });
+          },
+          submitChoice: function(choice, index) {
+            var choiceText = choice.text;
+            this.pushLogs("You", choiceText, []);
+            for (var choice of this.logs[index].choiceList) {
+              choice.isPushed = true;
+            }
+            setTimeout(() => this.pushNextChoiceLog(choiceText), 800);
+          },
+          pushNextChoiceLog: function(choiceText) {
+            var text;
+            var choiceList = [];
+            switch (choiceText) {
+              case chatbotQuestion:
+                text =
+                  "「チャットボット（chatbot）」とは、「チャット」と「ボット」を組み合わせた言葉で、「自動会話プログラム」のことです。近年では様々な種類のチャットボットが各企業で取り入れられています。ちなみにSIGではまだ取り扱っていません。";
+                choiceList = [
+                  this.getChoiceObject(chatbotVariation),
+                  this.getChoiceObject(chatbotMerit),
+                  this.getChoiceObject(restartText)
+                ];
+                break;
+              case chatbotVariation:
+                text =
+                  "大きく分けてルールベース型と機械学習型の二種類のチャットボットが存在します。本チャットボットはルールベース型になります。";
+                choiceList = [
+                  this.getChoiceObject(ruleType),
+                  this.getChoiceObject(aiType),
+                  this.getChoiceObject(restartText)
+                ];
+                break;
+              case ruleType:
+                text =
+                  "ルールベース型とはあらかじめ決められたルールに基づいて解答を行うチャットボットです。構築は簡単ですが、シナリオに沿った回答以外は出来ず、表記ゆれ等にも弱いのがデメリットです。";
+                choiceList = [
+                  this.getChoiceObject(aiType),
+                  this.getChoiceObject(restartText)
+                ];
+                break;
+              case aiType:
+                text =
+                  "機械学習型とは会話データを解析して、最も精度が高いと思われる解答を行うチャットボットです。シナリオ型に比べると広範囲に対応が出来て、かつ精度も高いですが。構築が難しく、大量のデータが必要になります。";
+                choiceList = [
+                  this.getChoiceObject(ruleType),
+                  this.getChoiceObject(restartText)
+                ];
+                break;
+              case chatbotMerit:
+                text =
+                  "チャットボットのメリットは「24時間稼働可能（理論上は）」「人的コスト削減」「ユーザーが気楽に使用できる」になります。";
+                choiceList = [this.getChoiceObject(restartText)];
+                break;
+              case truth:
+                text = "。。。";
+                choiceList = [this.getChoiceObject(restartText)];
+                break;
+              case startChatBot:
+              case restartText:
+                text =
+                  "チャットボットについて気になる点、ご不明な点等ございましたら。お気軽にご質問ください。";
+                choiceList = [
+                  this.getChoiceObject(chatbotQuestion),
+                  this.getChoiceObject(chatbotVariation),
+                  this.getChoiceObject(chatbotMerit),
+                  this.getChoiceObject(truth)
+                ];
+                break;
+              default:
+                choiceList = [this.getChoiceObject(restartText)];
+            }
+            this.pushLogs(botName, text, choiceList);
+          },
+          getChoiceObject: function(t) {
+            return {
+              text: t,
+              isPushed: false
+            };
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
