@@ -1,4 +1,4 @@
-# 7 　選択肢を表示してみよう
+# 9 　cssを少し変更しよう
 
 ```html
 <!DOCTYPE html>
@@ -13,9 +13,16 @@
         min-height: 90vh;
         flex-direction: column;
       }
+      /* ここから */
+      header{
+        color:white;
+        background-color:royalblue
+      }
       body {
         text-align: center;
+        background-color:#EEE;
       }
+      /* ここまで */
       main {
         flex: auto;
       }
@@ -87,11 +94,13 @@
       </footer>
     </div>
     <script>
-      // ここから
-      // 11 選択肢の定数を追加しよう
       const startChatBot = "startChatBot";
       const choiceA = "A";
       const choiceB = "B";
+      const choiceC = "C";
+      const choiceD = "D";
+      const choiceE = "E";
+      const choiceF = "F";
       let app = new Vue({
         el: "#app",
         data: {
@@ -107,18 +116,23 @@
         methods: {
           submit: function(event) {
             console.log("送信！");
-            // 12 選択肢を画面に表示するための関数を追加しよう
             this.submitPushed = true;
             this.pushNextChoiceLog(startChatBot);
           },
           pushLogs: function(speaker, text, choiceList) {
-            // 13 選択肢を画面に表示するための関数を追加しよう
-            this.logs.push({ speaker, text, choiceList });
+             this.logs.push({ speaker, text, choiceList });
             Vue.nextTick(() => {
               this.$refs.scrollp.scrollTop = this.$refs.scrollp.scrollHeight;
             });
           },
-          // 14 選択肢を画面に表示するための関数を追加しよう ここから
+          submitChoice: function(choice, index) {
+            var choiceText = choice.text;
+            this.pushLogs("You", choiceText, []);
+            for (var choice of this.logs[index].choiceList) {
+              choice.isPushed = true;
+            }
+            setTimeout(() => this.pushNextChoiceLog(choiceText), 800);
+          },
           pushNextChoiceLog: function(choiceText) {
             var text;
             var choiceList = [];
@@ -126,6 +140,17 @@
               case startChatBot:
                 text = "choice A or B";
                 choiceList = [this.getChoiceObject(choiceA), this.getChoiceObject(choiceB) ];
+                break;
+              case choiceA:
+                text = "choice C or D";
+                choiceList = [this.getChoiceObject(choiceC), this.getChoiceObject(choiceD) ];
+                break;
+              case choiceB:
+                text = "choice E or F";
+                choiceList = [this.getChoiceObject(choiceE), this.getChoiceObject(choiceF) ];
+                break;
+              default:
+                text = "finish";
                 break;
             }
             this.pushLogs("Chat bot", text, choiceList);
@@ -138,7 +163,6 @@
           }
         }
       });
-      // ここまで
     </script>
   </body>
 </html>
